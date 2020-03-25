@@ -57,6 +57,18 @@ If keyfile and certfile are ommited, the web server serves on http://localhost:8
 
 The server simply returns a PNG that can be embedded in other portals (e.g. Home Assistant)
 
+## Dependencies
+
+`dwd_forecast`:
+* `pandas`: Forecast results are given as pandas `Dataframes`
+* `geopy`: [optional], needed to find nearest station via latitude/longitude search
+
+`weather_plot`, additionally:
+* `matplotlib`, `numpy` for plotting
+
+`weather_server, additionally:
+* `flask`, `gevent` for the web server part.
+
 ## References
 
 * [A list of all weather stations supported by DWD](https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102)
