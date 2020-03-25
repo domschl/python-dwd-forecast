@@ -42,6 +42,7 @@ dw.head()  # dataframe with detailed forecast information (see https://opendata.
 
 ```python
 from weather_plot import DwdForecastPlot
+wp=DwdForecastPlot()
 wp.plot("10865",image_file='weather.png')  # station-id 10865 from above.
 ```
 
@@ -49,7 +50,7 @@ wp.plot("10865",image_file='weather.png')  # station-id 10865 from above.
 
 ```python
 from weather_server import WeatherServer
-ws = WeatherServer(port=8089, keyfile=my_keyfile, certfile=my_certfile)
+ws = WeatherServer(port=8089, keyfile=my_keyfile, certfile=my_certfile) # creates thread that serves web requests
 while True:
     time.sleep(1)
 ```
