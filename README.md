@@ -1,6 +1,6 @@
 # python-dwd-forecast
 
-Detailed weather forecast from DWD (Deutscher Wetter Dienst)
+Detailed weather forecast from [DWD (Deutscher Wetter Dienst)](https://www.dwd.de/EN/ourservices/opendata/opendata.html)
 
 This provides:
 
@@ -75,6 +75,7 @@ Downloaded data is automatically cached to prevent unnecessary load on the DWD s
 
 ## References
 
+* The [DWD Open Data](https://www.dwd.de/EN/ourservices/opendata/opendata.html) project.
 * [A list of all weather stations supported by DWD](https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102)
 * [Documentation for the weather station list](https://www.dwd.de/DE/leistungen/klimadatendeutschland/stationsliste.html)
 * [Documentation of forecast data format](https://opendata.dwd.de/weather/lib/MetElementDefinition.xml)
