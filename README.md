@@ -38,14 +38,14 @@ dw=d.station_forecast('10865')  # station-id from above
 dw.head()  # dataframe with detailed forecast information (see https://opendata.dwd.de/weather/lib/MetElementDefinition.xml)
 ```
 
-### Plot a forecast
+## `weather_plot`: plot a forecast
 
 ```python
 from weather_plot import DwdForecastPlot
 wp.plot("10865",image_file='weather.png')  # station-id 10865 from above.
 ```
 
-### Your private weather forecast server
+## `weather_server`: your private weather forecast server
 
 ```python
 from weather_server import WeatherServer
