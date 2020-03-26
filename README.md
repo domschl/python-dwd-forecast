@@ -58,6 +58,15 @@ If keyfile and certfile are ommited, the web server serves on http://localhost:8
 
 The server simply returns a PNG that can be embedded in other portals (e.g. Home Assistant)
 
+## Start weather server
+
+```bash
+python weather_server.py --port 8089 --certfile cert.pem --keyfile key.pem
+```
+This starts a web server on port 8089, access for example for station 10865 with: http://localhost:8089/station/10865 (no certs given). With cert- and keyfile given, https is used: https://hostname:8089/station/10865
+
+The file `weather_server_sample.service` can be used as a base for systemd installatins.
+
 ## Dependencies
 
 `dwd_forecast`:
