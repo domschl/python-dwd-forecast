@@ -1,0 +1,14 @@
+# Simple weather forecast web server
+
+[Unit]
+Description=Weather forecast
+After=network.target
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/usr/local/bin/weather_server
+ExecStart=/usr/bin/python /usr/local/bin/weather_server/weather_server.py -p 8089 -c certs/cert.pem -k certs/key.pem
+
+[Install]
+WantedBy=multi-user.target
