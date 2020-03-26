@@ -67,7 +67,7 @@ The server simply returns a PNG that can be embedded in other portals (e.g. Home
 `weather_plot`, additionally:
 * `matplotlib`, `numpy` for plotting
 
-`weather_server, additionally:
+`weather_server`, additionally:
 * `flask`, `gevent` for the web server part.
 
 ## Notes
