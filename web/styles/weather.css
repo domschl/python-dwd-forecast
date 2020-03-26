@@ -1,0 +1,6 @@
+/* css */
+
+body {
+    background: var(--color-dddark, #fff);
+    color: var(--color-light)
+}

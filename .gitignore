@@ -3,5 +3,5 @@ lsp.log
 cache/
 certs/
 .ipynb_checkpoints/
-*.png
+weather.png
 

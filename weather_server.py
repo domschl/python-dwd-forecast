@@ -42,24 +42,24 @@ class WeatherServer:
         self.app.add_url_rule('/', 'root', self.weather_plot)
         self.app.add_url_rule('/index.html', 'index', self.weather_plot)
         self.app.add_url_rule('/station/<path:path>', 'stations', self.stations)
-        # self.app.add_url_rule('/scripts/weather.js',
-        #                       'script', self.weather_script)
-        # self.app.add_url_rule('/styles/weather.css',
-        #                       'style', self.weather_style)
+        self.app.add_url_rule('/scripts/weather.js',
+                              'script', self.weather_script)
+        self.app.add_url_rule('/styles/weather.css',
+                              'style', self.weather_style)
         self.app.add_url_rule('/weather.png',
                               'weather', self.weather_plot)
         self.active = True
         self.socket_handler()  # Start threads for web
         self.wplot=weather_plot.DwdForecastPlot()
 
-    # def web_root(self):
-    #     return self.app.send_static_file('index.html')
+    def web_root(self):
+        return self.app.send_static_file('index.html')
 
-    # def weather_script(self):
-    #     return self.app.send_static_file('scripts/weather.js')
+    def weather_script(self):
+        return self.app.send_static_file('scripts/weather.js')
 
-    # def weather_style(self):
-    #     return self.app.send_static_file('styles/weather.css')
+    def weather_style(self):
+        return self.app.send_static_file('styles/weather.css')
 
     def weather_plot(self):
         imagefile=os.path.join(self.static_resources,'weather.png')
