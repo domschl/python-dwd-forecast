@@ -18,7 +18,11 @@ Have a look at the [jupyter notebook](https://github.com/domschl/python-dwd-fore
 
 ### Find your station id
 
-Either use the [reference list](https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102) provided by the Open Data project of DWD, or search via location:
+Either use the [reference list](https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102), column `Stations-kennung` provided by the Open Data project of DWD, or use the location API below.
+
+Caveat: this list contains many weather stations that are no longer active, or do not provide forecast data. If you want to search manually, you will need to search for stations that are still active (look at `Ende` column which marks the last data transmission) and actually provide data. 
+
+The API call `get_closest(lat,lon)` does that automatically.
 
 ```python
 from dwd_forecast import DWD
