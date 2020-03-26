@@ -71,6 +71,8 @@ python weather_server.py --port 8089 --certfile cert.pem --keyfile key.pem
 ```
 This starts a web server on port 8089, access for example for station 10865 with: http://localhost:8089/station/10865 (no certs given). With cert- and keyfile given, https is used: https://hostname:8089/station/10865
 
+For auto-refresh, use the urls http[s]://hostname:8089/auto/10865. This loads a page that uses a simple script to automatically reload the updated forecasts (e.g. for use in panels that are permanently displayed.)
+
 The file `weather_server_sample.service` can be used as a base for systemd installatins.
 
 ## Dependencies

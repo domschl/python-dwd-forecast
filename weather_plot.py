@@ -112,6 +112,10 @@ class DwdForecastPlot:
         my_dpi=96
         plt.figure(figsize=(800/my_dpi, 480/my_dpi), dpi=my_dpi)
         fig, ax1 = plt.subplots()
+
+        title=time.strftime("%A, %d.%m.%y %H:%M")
+        ax1.text(1, 1, title, horizontalalignment='right', verticalalignment='bottom', transform=ax1.transAxes)
+
         ax2=ax1.twinx()
 
         fig.set_size_inches(800/my_dpi, 480/my_dpi)
