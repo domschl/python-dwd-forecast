@@ -18,6 +18,7 @@ class WeatherServer:
         mimetypes.add_type('text/css', '.css')
         mimetypes.add_type('text/javascript', '.js')
         mimetypes.add_type('image/png', '.png')
+        mimetypes.add_type('image/png', '.ico')
 
         self.log = logging.getLogger("WeatherServer")
         self.port = port
@@ -42,10 +43,13 @@ class WeatherServer:
         self.app.add_url_rule('/', 'root', self.weather_plot)
         self.app.add_url_rule('/index.html', 'index', self.weather_plot)
         self.app.add_url_rule('/station/<path:path>', 'stations', self.stations)
+        self.app.add_url_rule('/auto/<path:path>', 'autostations', self.autostations)
         self.app.add_url_rule('/scripts/weather.js',
                               'script', self.weather_script)
         self.app.add_url_rule('/styles/weather.css',
                               'style', self.weather_style)
+        self.app.add_url_rule('/favicon.ico',
+                              'favi', self.favicon)
         self.app.add_url_rule('/weather.png',
                               'weather', self.weather_plot)
         self.active = True
@@ -55,6 +59,10 @@ class WeatherServer:
     def web_root(self):
         return self.app.send_static_file('index.html')
 
+    def favicon(self):
+        self.log.info("favi-info")
+        return self.app.send_static_file('favicon.ico')
+
     def weather_script(self):
         return self.app.send_static_file('scripts/weather.js')
 
@@ -62,12 +70,16 @@ class WeatherServer:
         return self.app.send_static_file('styles/weather.css')
 
     def weather_plot(self):
-        imagefile=os.path.join(self.static_resources,'weather.png')
+        imagefile=os.path.join(self.static_resources,'/weather.png')
         self.wplot.plot(self.station_id,image_file=imagefile)
         return self.app.send_static_file('weather.png')
 
+    def autostations(self, path):
+        return self.app.send_static_file('index.html')
+
     def stations(self, path):
         id=path.split('/')[-1]
+        self.log.info("We are getting {id}")
         imagefile=os.path.join(self.static_resources,'weather.png')
         self.wplot.plot(id,image_file=imagefile)
         return self.app.send_static_file('weather.png')
