@@ -142,6 +142,7 @@ class DwdForecastPlot:
         fig.autofmt_xdate()
         if image_file is not None:
             plt.savefig(image_file,dpi=my_dpi,bbox_inches='tight')
+        plt.close('all')  # otherwise auto-refresh of web-server creates infinite number of figures...
 
 
 if __name__ == '__main__':
