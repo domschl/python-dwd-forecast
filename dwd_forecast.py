@@ -44,7 +44,7 @@ class DWD:
                     return
             self.cachedir=cache_directory
         self.station_list_url='https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102'
-        self.station_list_cache_days=30
+        self.station_list_cache_days=1
         self.station_list_df=None
         # self.forecasts_all_url='https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L_LATEST.kmz'
         self.forecast_station_url='https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/{0}/kml/MOSMIX_L_LATEST_{0}.kmz'

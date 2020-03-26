@@ -87,7 +87,7 @@ The file `weather_server_sample.service` can be used as a base for systemd insta
 
 ## Notes
 
-Downloaded data is automatically cached to prevent unnecessary load on the DWD servers. Station-ID lists are cached for 30 days, and weather forecast data ist cached for 1 hour before the next download is initiated.
+Downloaded data is automatically cached to prevent unnecessary load on the DWD servers. Station-ID lists are cached for 1 day, and weather forecast data ist cached for 1 hour before the next download is initiated.
 
 ## References
 
