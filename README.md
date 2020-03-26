@@ -1,6 +1,6 @@
 # python-dwd-forecast
 
-Detailed weather forecast from DWD (Deutscher Wetter Dienst)
+Detailed weather forecast from [DWD (Deutscher Wetter Dienst)](https://www.dwd.de/EN/ourservices/opendata/opendata.html)
 
 This provides:
 
@@ -42,6 +42,7 @@ dw.head()  # dataframe with detailed forecast information (see https://opendata.
 
 ```python
 from weather_plot import DwdForecastPlot
+wp=DwdForecastPlot()
 wp.plot("10865",image_file='weather.png')  # station-id 10865 from above.
 ```
 
@@ -49,16 +50,33 @@ wp.plot("10865",image_file='weather.png')  # station-id 10865 from above.
 
 ```python
 from weather_server import WeatherServer
-ws = WeatherServer(port=8089, keyfile=my_keyfile, certfile=my_certfile)
+ws = WeatherServer(port=8089, keyfile=my_keyfile, certfile=my_certfile) # creates thread that serves web requests
 while True:
     time.sleep(1)
 ```
-If keyfile and certfile are ommited, the web server serves on http://localhost:8089/station/<id>, e.g. http://localhost:8089/10865. With cert- and keyfile given, https is used: https://hostname:8089/station/10865.
+If keyfile and certfile are ommited, the web server serves on http://localhost:8089/station/my-station-id, e.g. http://localhost:8089/station/10865. With cert- and keyfile given, https is used: https://hostname:8089/station/10865.
 
 The server simply returns a PNG that can be embedded in other portals (e.g. Home Assistant)
 
+## Dependencies
+
+`dwd_forecast`:
+* `pandas`: Forecast results are given as pandas `Dataframes`
+* `geopy`: [optional], needed to find nearest station via latitude/longitude search
+
+`weather_plot`, additionally:
+* `matplotlib`, `numpy` for plotting
+
+`weather_server, additionally:
+* `flask`, `gevent` for the web server part.
+
+## Notes
+
+Downloaded data is automatically cached to prevent unnecessary load on the DWD servers. Station-ID lists are cached for 30 days, and weather forecast data ist cached for 1 hour before the next download is initiated.
+
 ## References
 
+* The [DWD Open Data](https://www.dwd.de/EN/ourservices/opendata/opendata.html) project.
 * [A list of all weather stations supported by DWD](https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102)
 * [Documentation for the weather station list](https://www.dwd.de/DE/leistungen/klimadatendeutschland/stationsliste.html)
 * [Documentation of forecast data format](https://opendata.dwd.de/weather/lib/MetElementDefinition.xml)
