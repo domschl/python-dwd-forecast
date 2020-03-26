@@ -79,7 +79,7 @@ class WeatherServer:
 
     def stations(self, path):
         id=path.split('/')[-1]
-        self.log.info("We are getting {id}")
+        self.log.info(f"We are getting {id}")
         imagefile=os.path.join(self.static_resources,'weather.png')
         self.wplot.plot(id,image_file=imagefile)
         return self.app.send_static_file('weather.png')
