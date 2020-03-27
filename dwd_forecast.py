@@ -46,7 +46,7 @@ class DWD:
         self.station_list_url='https://www.dwd.de/DE/leistungen/klimadatendeutschland/statliste/statlex_html.html?view=nasPublication&nn=16102'
         self.station_list_cache_days=1
         self.station_list_df=None
-        # self.forecasts_all_url='https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L_LATEST.kmz'
+        self.forecasts_all_url='https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/all_stations/kml/MOSMIX_L_LATEST.kmz'
         self.forecast_station_url='https://opendata.dwd.de/weather/local_forecasts/mos/MOSMIX_L/single_stations/{0}/kml/MOSMIX_L_LATEST_{0}.kmz'
         self.forecast_max_cache_secs=3600
 
@@ -214,20 +214,21 @@ class DWD:
             return None
         return iodata
 
-    # def _download_forecast_all(self):
-    #    return self._download_unpack(self.forecasts_all_url)
+    def _download_forecast_all(self):
+        return self._download_unpack(self.forecasts_all_url)
 
     def _download_station_forecast_raw(self,  station_id):
         dl_url = self.forecast_station_url.format(station_id)
         return self._download_unpack(dl_url)
 
     def station_forecast(self, station_id, force_cache_refresh=False):
-        # if station_id is None:
-        #     forecast_cache_file = os.path.join(self.cachedir, 'station-forecast-all.json')
-        # else:
-        forecast_cache_file = os.path.join(self.cachedir, f'station-forecast-{station_id}.json')
+        if station_id is None:
+            forecast_cache_file = os.path.join(self.cachedir, 'station-forecast-all.json')
+        else:
+            forecast_cache_file = os.path.join(self.cachedir, f'station-forecast-{station_id}.json')
 
         dfd=None
+        locations=None
         read_station_forecast=False
         if force_cache_refresh is True or os.path.exists(forecast_cache_file) is False:
             read_station_forecast=True
@@ -240,8 +241,12 @@ class DWD:
                     read_station_forecast=True
                 del station_forecast['timestamp']
                 try:
-                    dfd=pd.read_json(json.dumps(station_forecast))
-                    self.log.debug(f'Station forecast {station_id} read from cache {forecast_cache_file}')
+                    if station_id is None:
+                        locations=pd.read_json(json.dumps(station_forecast))
+                        self.log.debug(f'Station forecast ALL read from cache {forecast_cache_file}')
+                    else:
+                        dfd=pd.read_json(json.dumps(station_forecast))
+                        self.log.debug(f'Station forecast {station_id} read from cache {forecast_cache_file}')
                 except Exception as e:
                     self.log.warning(f'Failed to convert station forecast to dataframe: {e}, trying to reload')
                     read_station_forecast=True
@@ -250,10 +255,10 @@ class DWD:
                 read_station_forecast =True
 
         if read_station_forecast is True:
-            # if station_id is None:
-            #     iodata = self._download_forecast_all()
-            # else:
-            iodata = self._download_station_forecast_raw(station_id)
+            if station_id is None:
+                iodata = self._download_forecast_all()
+            else:
+                iodata = self._download_station_forecast_raw(station_id)
             if iodata is None:
                 return None
             self.log.debug(f"Starting to parse station {station_id} xml...")
@@ -301,23 +306,41 @@ class DWD:
                     location['forecast'] = dfd
                     locations.append(location)
                     location = None
-            if len(locations)!=1:
-                self.log.error('Internal: length of locations is {len(locations)}, expected 1.')
-                return False
-            dfd=locations[0]['forecast']
-            try:
-                forecast=json.loads(dfd.to_json())
-                forecast['timestamp']=time.time()
-            except Exception as e:
-                self.log.warning(f'Failed to convert forecast to json: {e}')
-                return dfd
-            try:
-                with open(forecast_cache_file, 'w') as f:
-                    json.dump(forecast,f)
-            except Exception as e:
-                self.log.warning(f'Failed to write forecast cache file {forecast_cache_file}: {e}')
-
-        return dfd
+            if station_id is not None:
+                if len(locations)!=1:
+                    self.log.error('Internal: length of locations is {len(locations)}, expected 1.')
+                    return False
+                dfd=locations[0]['forecast']
+                try:
+                    forecast=json.loads(dfd.to_json())
+                    forecast['timestamp']=time.time()
+                except Exception as e:
+                    self.log.warning(f'Failed to convert forecast to json: {e}')
+                    return dfd
+                try:
+                    with open(forecast_cache_file, 'w') as f:
+                        json.dump(forecast,f)
+                except Exception as e:
+                    self.log.warning(f'Failed to write forecast cache file {forecast_cache_file}: {e}')
+            else:
+                try:
+                    all_forecasts={'timestamp': time.time(),
+                                    locations: []}
+                    forecasts=json.loads(locations.to_json())
+                    forecast['timestamp']=time.time()
+                except Exception as e:
+                    self.log.warning(f'Failed to convert forecast to json: {e}')
+                    return dfd
+                try:
+                    with open(forecast_cache_file, 'w') as f:
+                        json.dump(forecast,f)
+                except Exception as e:
+                    self.log.warning(f'Failed to write forecast cache file {forecast_cache_file}: {e}')
+                
+        if station_id is None:
+            return locations
+        else:
+            return dfd
 
 
 if __name__ == '__main__':
