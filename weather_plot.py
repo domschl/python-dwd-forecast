@@ -74,7 +74,7 @@ class DwdForecastPlot:
         # bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
         # arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=60")
         kw = dict(xycoords='data',textcoords="offset points",clip_on=True,
-                ha="center", va="center",zorder=4) # arrowprops=arrowprops, bbox=bbox_props, 
+                ha="center", va="center") # arrowprops=arrowprops, bbox=bbox_props, 
         ax.annotate(text, xy=(x,y), xytext=offset,**kw)
         
     def annot_local_minmax(self,x,y, ax=None):
@@ -110,33 +110,39 @@ class DwdForecastPlot:
 
 
         my_dpi=96
+        # plt.style.use("seaborn-talk")
         plt.figure(figsize=(800/my_dpi, 480/my_dpi), dpi=my_dpi)
         fig, ax1 = plt.subplots()
+        fig.set_size_inches(800/my_dpi, 480/my_dpi)
 
+        ax1.set_zorder(10)
+        ax1.patch.set_visible(False)
         title="DWD OpenData - "+time.strftime("%A, %d.%m.%y %H:%M")
         ax1.text(1, 1, title, horizontalalignment='right', verticalalignment='bottom', transform=ax1.transAxes)
 
-        ax2=ax1.twinx()
-
-        fig.set_size_inches(800/my_dpi, 480/my_dpi)
-        ax1.plot(xl,y,alpha=1.0,color='r',zorder=3)
-        ax1.grid(True)
-
-        ax2=ax1.twinx()
-        ax2.fill_between(x,0,y_sun,color='y',alpha=0.4,zorder=0)
-        ax2.set_ylim(0,1)
-
         ax3=ax1.twinx()
-        ax3.fill_between(x,0,y_rain,color='b',alpha=0.2,zorder=1)
+        ax3.set_zorder(1)
+        ax3.fill_between(x,0,y_rain,color='cornflowerblue',alpha=1.0)
         ax3.set_ylim(0,1)
-
+        
         ax4=ax1.twinx()
-        ax4.fill_between(x,0,y_rain_dur,color='b',alpha=0.3,zorder=2)
+        ax4.set_zorder(2)
+        ax4.fill_between(x,0,y_rain_dur,color='midnightblue',alpha=1.0)
         ax4.set_ylim(0,1)
-                
+        
+        ax2=ax1.twinx()
+        ax2.set_zorder(3)
+        ax2.grid(False)
+        ax2.fill_between(x,0,y_sun,color='gold',alpha=1.0)
+        ax2.set_ylim(0,1)
+        
+        ax1.plot(xl,y,alpha=1.0,color='firebrick')
+        ax1.grid(True)
+        # ax1.set_axisbelow(False)
+
         self.annot_local_minmax(xl,y,ax1)
 
-        ax1.axvline(datetime.datetime.now(), color='k', zorder=10, alpha=0.5)
+        ax1.axvline(datetime.datetime.now(), color='dimgray', alpha=1)
 
         loc = WeekdayLocator(byweekday=(MO,TU,WE,TH,FR,SA,SU))  #, tz=tz)
         ax1.xaxis.set_major_locator(loc)
