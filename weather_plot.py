@@ -73,9 +73,9 @@ class DwdForecastPlot:
     def annotate(self, ax,x,y,text,offset):
         # bbox_props = dict(boxstyle="square,pad=0.3", fc="w", ec="k", lw=0.72)
         # arrowprops=dict(arrowstyle="->",connectionstyle="angle,angleA=0,angleB=60")
-        kw = dict(xycoords='data',textcoords="offset points",clip_on=True,
+        kw = dict(xycoords='data',textcoords="offset points",#clip_on=True,
                 ha="center", va="center") # arrowprops=arrowprops, bbox=bbox_props, 
-        ax.annotate(text, xy=(x,y), xytext=offset,**kw)
+        ax.annotate(text, xy=(x,y), xytext=offset, annotation_clip=False, **kw)
         
     def annot_local_minmax(self,x,y, ax=None):
         mins, maxs=self.get_local_minmaxs(x,y,mindist=5)
@@ -85,15 +85,15 @@ class DwdForecastPlot:
             ymax = maxi[1] # y.max()
             dt=xmax.strftime('%H:%M')
             text= "{:.1f}°C\n{}".format(ymax,dt)
-            self.annotate(ax,xmax,ymax,text,(0,0))
+            self.annotate(ax,xmax,ymax,text,(7,15))
             
             xmin = mini[0] # x[np.argmax(y)]
             ymin = mini[1] # y.max()
             dt=xmin.strftime('%H:%M')
             text= "{:.1f}°C\n{}".format(ymin,dt)
-            self.annotate(ax,xmin,ymin,text,(0,0))
+            self.annotate(ax,xmin,ymin,text,(7,-15))
 
-    def plot(self, station_id, image_file='weather.png', force_cache_refresh=False):
+    def plot(self, station_id, image_file='weather.png', force_cache_refresh=False, close_plot=True):
         self.dx=self.dwd.station_forecast(station_id, force_cache_refresh=force_cache_refresh)
         if self.dx is None:
             return None
@@ -122,18 +122,18 @@ class DwdForecastPlot:
 
         ax3=ax1.twinx()
         ax3.set_zorder(1)
-        ax3.fill_between(x,0,y_rain,color='cornflowerblue',alpha=1.0)
+        ax3.fill_between(x,0,y_rain,color='lightblue',alpha=0.6)
         ax3.set_ylim(0,1)
         
         ax4=ax1.twinx()
         ax4.set_zorder(2)
-        ax4.fill_between(x,0,y_rain_dur,color='midnightblue',alpha=1.0)
+        ax4.fill_between(x,0,y_rain_dur,color='cornflowerblue',alpha=0.7)
         ax4.set_ylim(0,1)
         
         ax2=ax1.twinx()
         ax2.set_zorder(3)
         ax2.grid(False)
-        ax2.fill_between(x,0,y_sun,color='gold',alpha=1.0)
+        ax2.fill_between(x,0,y_sun,color='gold',alpha=0.6)
         ax2.set_ylim(0,1)
         
         ax1.plot(xl,y,alpha=1.0,color='firebrick')
@@ -144,6 +144,11 @@ class DwdForecastPlot:
 
         ax1.axvline(datetime.datetime.now(), color='dimgray', alpha=1)
 
+        lim=ax1.get_ylim()
+        d=lim[1]-lim[0]
+        lim2=(lim[0]-d/10, lim[1]+d/10)
+        ax1.set_ylim(lim2)
+        
         loc = WeekdayLocator(byweekday=(MO,TU,WE,TH,FR,SA,SU))  #, tz=tz)
         ax1.xaxis.set_major_locator(loc)
 
@@ -152,7 +157,9 @@ class DwdForecastPlot:
         fig.autofmt_xdate()
         if image_file is not None:
             plt.savefig(image_file,dpi=my_dpi,bbox_inches='tight')
-        plt.close('all')  # otherwise auto-refresh of web-server creates infinite number of figures...
+        if close_plot is True:
+            plt.close('all')  # otherwise auto-refresh of web-server creates infinite number of figures...
+        return ax1
 
 
 if __name__ == '__main__':
