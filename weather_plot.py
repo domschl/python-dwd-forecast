@@ -11,6 +11,7 @@ import datetime
 from matplotlib.dates import MO, TU, WE, TH, FR, SA, SU
 from matplotlib.dates import WeekdayLocator
 from matplotlib.dates import DateFormatter
+from matplotlib.ticker import MaxNLocator
 
 from dateutil import tz
 import time
@@ -110,7 +111,6 @@ class DwdForecastPlot:
 
 
         my_dpi=96
-        # plt.style.use("seaborn-talk")
         plt.figure(figsize=(800/my_dpi, 480/my_dpi), dpi=my_dpi)
         fig, ax1 = plt.subplots()
         fig.set_size_inches(800/my_dpi, 480/my_dpi)
@@ -118,7 +118,7 @@ class DwdForecastPlot:
         ax1.set_zorder(10)
         ax1.patch.set_visible(False)
         title="DWD OpenData - "+time.strftime("%A, %d.%m.%y %H:%M")
-        ax1.text(1, 1, title, horizontalalignment='right', verticalalignment='bottom', transform=ax1.transAxes)
+        ax1.text(1, 1.01, title, horizontalalignment='right', color='gray', verticalalignment='bottom', transform=ax1.transAxes)
 
         ax3=ax1.twinx()
         ax3.set_zorder(1)
@@ -136,13 +136,13 @@ class DwdForecastPlot:
         ax2.fill_between(x,0,y_sun,color='gold',alpha=0.6)
         ax2.set_ylim(0,1)
         
-        ax1.plot(xl,y,alpha=1.0,color='firebrick')
-        ax1.grid(True)
+        ax1.plot(xl,y,alpha=0.6,linewidth=3, color='orangered')
+        ax1.grid(True, linestyle='dotted')
         # ax1.set_axisbelow(False)
 
         self.annot_local_minmax(xl,y,ax1)
 
-        ax1.axvline(datetime.datetime.now(), color='dimgray', alpha=1)
+        ax1.axvline(datetime.datetime.now(), color='dimgray', alpha=0.6)
 
         lim=ax1.get_ylim()
         d=lim[1]-lim[0]
@@ -152,14 +152,19 @@ class DwdForecastPlot:
         loc = WeekdayLocator(byweekday=(MO,TU,WE,TH,FR,SA,SU))  #, tz=tz)
         ax1.xaxis.set_major_locator(loc)
 
-        better_formatter = DateFormatter('%a, %d.%m.')
+        better_formatter = DateFormatter('%a  \n%d.%m.')
         ax1.xaxis.set_major_formatter(better_formatter)
         fig.autofmt_xdate()
+        plt.setp( ax1.xaxis.get_majorticklabels(), rotation=0)
+
+        for tick in ax1.xaxis.get_major_ticks():
+            tick.label1.set_horizontalalignment('left')
+        # ax1.xaxis.set_major_locator(MaxNLocator(prune='both'))
+        
         if image_file is not None:
             plt.savefig(image_file,dpi=my_dpi,bbox_inches='tight')
         if close_plot is True:
             plt.close('all')  # otherwise auto-refresh of web-server creates infinite number of figures...
-        return ax1
 
 
 if __name__ == '__main__':
