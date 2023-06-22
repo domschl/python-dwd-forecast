@@ -132,9 +132,9 @@ class WeatherServer:
         self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
         # resize imagefile to 240x135 and save as weather.bmp
         image = Image.open(imagefile)
-        image_rgb = image.convert("RGB")
+        # image_rgb = image.convert("RGB")
         # Resize the image
-        resized_image = image_rgb.resize((240, 135))
+        resized_image = image.resize((240, 135))
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
 
         image_16bit = resized_image.convert("RGB565")
