@@ -135,19 +135,13 @@ class WeatherServer:
         image_rgb = image.convert("RGB")
         # Resize the image
         resized_image = image_rgb.resize((240, 135))
-        # Create a new empty image with the same size and mode
-        # bmp_image = Image.new("RGB", resized_image.size)
-        # Copy the pixel data from the RGB image to the BMP image
-        # bmp_image.putdata(list(resized_image.getdata()))
-
-        # Save the BMP image without compression
-        # bmp_image.save("output.bmp", format="BMP")
-
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
-        # bmp_image.save(
-        #     bmpimagefile, format="bitmap", bpp=24
-        # )  # , subsampling=0, optimize=False, quality=100)
-        self.save_bmp_24bit(resized_image, bmpimagefile)
+
+        image_16bit = resized_image.convert("RGB565")
+        # Save the image as a 16-bit BMP file
+        image_16bit.save(bmpimagefile, format="BMP")
+
+        # self.save_bmp_24bit(resized_image, bmpimagefile)
         # resized_image.save(bmpimagefile, format="BMP",
         return self.app.send_static_file("weather.bmp")
 
