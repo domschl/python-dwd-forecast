@@ -9,6 +9,7 @@ import os
 
 from flask import Flask, send_from_directory
 from gevent import pywsgi
+from PIL import Image
 
 import weather_plot
 
@@ -27,6 +28,7 @@ class WeatherServer:
         mimetypes.add_type("text/javascript", ".js")
         mimetypes.add_type("image/png", ".png")
         mimetypes.add_type("image/png", ".ico")
+        mimetypes.add_type("image/bmp", ".bmp")
 
         self.log = logging.getLogger("WeatherServer")
         self.port = port
@@ -52,11 +54,15 @@ class WeatherServer:
         self.app.add_url_rule("/", "root", self.weather_plot)
         self.app.add_url_rule("/index.html", "index", self.weather_plot)
         self.app.add_url_rule("/station/<path:path>", "stations", self.stations)
+        self.app.add_url_rule(
+            "/ministation/<path:path>", "ministations", self.ministations
+        )
         self.app.add_url_rule("/auto/<path:path>", "autostations", self.autostations)
         self.app.add_url_rule("/scripts/weather.js", "script", self.weather_script)
         self.app.add_url_rule("/styles/weather.css", "style", self.weather_style)
         self.app.add_url_rule("/favicon.ico", "favi", self.favicon)
         self.app.add_url_rule("/weather.png", "weather", self.weather_plot)
+        self.app.add_url_rule("/weather.bmp", "miniweather", self.miniweather_plot)
         self.active = True
         if threading is True:
             self.socket_handler()  # Start threads for web
@@ -80,6 +86,11 @@ class WeatherServer:
         self.wplot.plot(self.station_id, image_file=imagefile)
         return self.app.send_static_file("weather.png")
 
+    def miniweather_plot(self):
+        imagefile = os.path.join(self.static_resources, "/weather.bmp")
+        self.wplot.plot(self.station_id, image_file=imagefile)
+        return self.app.send_static_file("weather.bmp")
+
     def autostations(self, path):
         return self.app.send_static_file("index.html")
 
@@ -89,6 +100,22 @@ class WeatherServer:
         imagefile = os.path.join(self.static_resources, "weather.png")
         self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
         return self.app.send_static_file("weather.png")
+
+    def ministations(self, path):
+        id = path.split("/")[-1]
+        self.log.info(f"We are getting {id}")
+        imagefile = os.path.join(self.static_resources, "weather.png")
+        self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
+        # resize imagefile to 240x135 and save as weather.bmp
+        image = Image.open(imagefile)
+        # Resize the image
+        resized_image = image.resize((240, 135))
+        # Convert the image to BMP format
+        resized_image = resized_image.convert("RGB")
+        # Save the resized image as BMP
+        bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
+        resized_image.save(bmpimagefile, format="BMP")
+        return self.app.send_static_file("weather.bmp")
 
     def socket_event_worker_thread(self, log, app, keyfile=None, certfile=None):
         if self.certfile is None or self.keyfile is None:

@@ -88,6 +88,7 @@ Options: `-t`: use threading (crashes on macOS, matplotlib can't work in threads
 
 `weather_server`, additionally:
 * `flask`, `gevent` for the web server part.
+* `pillow`, to resize the resultant plot for Arudino billboards.
 
 ## Notes
 

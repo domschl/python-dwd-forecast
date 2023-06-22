@@ -1,7 +1,8 @@
 __pycache__/
+.vscode/
 lsp.log
 cache/
 certs/
 .ipynb_checkpoints/
 weather.png
-
+weather.bmp
