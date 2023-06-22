@@ -56,7 +56,7 @@ wp.plot("10865",image_file='weather.png')  # station-id 10865 from above.
 
 ```python
 from weather_server import WeatherServer
-ws = WeatherServer(port=8089, keyfile=my_keyfile, certfile=my_certfile) # creates thread that serves web requests
+ws = WeatherServer(port=8089, keyfile=my_keyfile, certfile=my_certfile, threading=True) # creates thread that serves web requests, use `threading=False` with macOS.
 while True:
     time.sleep(1)
 ```
@@ -67,13 +67,15 @@ The server simply returns a PNG that can be embedded in other portals (e.g. Home
 ## Start weather server
 
 ```bash
-python weather_server.py --port 8089 --certfile cert.pem --keyfile key.pem
+python weather_server.py --port 8089 --certfile cert.pem --keyfile key.pem [-t] [--dpi 96]
 ```
 This starts a web server on port 8089, access for example for station 10865 with: http://localhost:8089/station/10865 (no certs given). With cert- and keyfile given, https is used: https://hostname:8089/station/10865
 
 For auto-refresh, use the urls http[s]://hostname:8089/auto/10865. This loads a page that uses a simple script to automatically reload the updated forecasts (e.g. for use in panels that are permanently displayed.)
 
 The file `weather_server_sample.service` can be used as a base for systemd installatins.
+
+Options: `-t`: use threading (crashes on macOS, matplotlib can't work in threads!), `--dpi 96` font resolution.
 
 ## Dependencies
 
@@ -90,6 +92,12 @@ The file `weather_server_sample.service` can be used as a base for systemd insta
 ## Notes
 
 Downloaded data is automatically cached to prevent unnecessary load on the DWD servers. Station-ID lists are cached for 1 day, and weather forecast data ist cached for 1 hour before the next download is initiated.
+
+## History
+
+- 2023-06-22: macOS crashes when using matplotlib in a thread (web server used threading by default in previous versions.). Now uses default main thread for operation. Use option `-t` to re-enable threading (for non macOS systems).
+- threading setDaemon parameter API renaming warning fixed.
+- new parameter `--dpi`, should be around 96, affects mainly relative font sizes
 
 ## References
 

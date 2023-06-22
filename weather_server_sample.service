@@ -8,7 +8,7 @@ After=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=/usr/local/bin/weather_server
-ExecStart=/usr/bin/python /usr/local/bin/weather_server/weather_server.py -p 8089 -c certs/cert.pem -k certs/key.pem
+ExecStart=/usr/bin/python /usr/local/bin/weather_server/weather_server.py -p 8089 -c certs/cert.pem -k certs/key.pem -t
 
 [Install]
 WantedBy=multi-user.target
