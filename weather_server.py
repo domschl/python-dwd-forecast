@@ -137,7 +137,7 @@ class WeatherServer:
         resized_image = image.resize((240, 135))
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
 
-        image_16bit = Image.new("RGB", resized_image.size)
+        image_16bit = Image.new("RGB565", resized_image.size)
 
         # Iterate over each pixel and convert to RGB565 format
         for y in range(resized_image.height):
