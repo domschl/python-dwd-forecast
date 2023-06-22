@@ -121,7 +121,7 @@ class WeatherServer:
 
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
         bmp_image.save(
-            bmpimagefile, format="BMP"
+            bmpimagefile, format="BMP", bpp=24
         )  # , subsampling=0, optimize=False, quality=100)
 
         # resized_image.save(bmpimagefile, format="BMP",
