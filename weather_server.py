@@ -114,7 +114,10 @@ class WeatherServer:
         resized_image = resized_image.convert("RGB")
         # Save the resized image as BMP
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
-        resized_image.save(bmpimagefile, format="BMP")
+        # save as uncompressed 24bit bmp:
+        resized_image.save(bmpimagefile, format="BMP", subsampling=0, quality=100)
+
+        # resized_image.save(bmpimagefile, format="BMP",
         return self.app.send_static_file("weather.bmp")
 
     def socket_event_worker_thread(self, log, app, keyfile=None, certfile=None):
