@@ -101,7 +101,7 @@ class WeatherServer:
 
         self.socket_event_thread = threading.Thread(
             target=self.socket_event_worker_thread, args=(self.log, self.app))
-        self.socket_event_thread.setDaemon(True)
+        self.socket_event_thread.daemon = True
         self.socket_event_thread.start()
 
 if __name__ == '__main__':
