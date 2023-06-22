@@ -108,16 +108,21 @@ class WeatherServer:
         self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
         # resize imagefile to 240x135 and save as weather.bmp
         image = Image.open(imagefile)
+        image_rgb = image.convert("RGB")
         # Resize the image
-        resized_image = image.resize((240, 135))
-        # Convert the image to BMP format
-        resized_image = resized_image.convert("RGB")
-        # Save the resized image as BMP
+        resized_image = image_rgb.resize((240, 135))
+        # Create a new empty image with the same size and mode
+        bmp_image = Image.new("RGB", resized_image.size)
+        # Copy the pixel data from the RGB image to the BMP image
+        bmp_image.putdata(list(resized_image.getdata()))
+
+        # Save the BMP image without compression
+        bmp_image.save("output.bmp", format="BMP")
+
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
-        # save as uncompressed 24bit bmp:
-        resized_image.save(
-            bmpimagefile, format="BMP", subsampling=0, optimize=False, quality=100
-        )
+        bmp_image.save(
+            bmpimagefile, format="BMP"
+        )  # , subsampling=0, optimize=False, quality=100)
 
         # resized_image.save(bmpimagefile, format="BMP",
         return self.app.send_static_file("weather.bmp")
