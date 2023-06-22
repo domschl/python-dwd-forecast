@@ -6,6 +6,7 @@ import json
 import mimetypes
 import socket
 import os
+import struct
 
 from flask import Flask, send_from_directory
 from gevent import pywsgi
@@ -101,6 +102,29 @@ class WeatherServer:
         self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
         return self.app.send_static_file("weather.png")
 
+    def save_bmp_24bit(self, image, output_file):
+        width, height = image.size
+        pixel_data = list(image.getdata())
+
+        # BMP header (14 bytes)
+        header = struct.pack("<2sIHHI", b"BM", 54 + width * height * 3, 0, 0, 54)
+
+        # DIB header (40 bytes)
+        dib_header = struct.pack(
+            "<IIIHHIIIIII", 40, width, height, 1, 24, 0, width * height * 3, 0, 0, 0, 0
+        )
+
+        # Pixel data (row order is reversed)
+        pixel_bytes = []
+        for i in range(height - 1, -1, -1):
+            for j in range(width):
+                r, g, b = pixel_data[i * width + j]
+                pixel_bytes.extend([b, g, r])
+
+        # Save the BMP file
+        with open(output_file, "wb") as f:
+            f.write(header + dib_header + bytes(pixel_bytes))
+
     def ministations(self, path):
         id = path.split("/")[-1]
         self.log.info(f"We are getting {id}")
@@ -112,18 +136,18 @@ class WeatherServer:
         # Resize the image
         resized_image = image_rgb.resize((240, 135))
         # Create a new empty image with the same size and mode
-        bmp_image = Image.new("RGB", resized_image.size)
+        # bmp_image = Image.new("RGB", resized_image.size)
         # Copy the pixel data from the RGB image to the BMP image
-        bmp_image.putdata(list(resized_image.getdata()))
+        # bmp_image.putdata(list(resized_image.getdata()))
 
         # Save the BMP image without compression
-        bmp_image.save("output.bmp", format="BMP")
+        # bmp_image.save("output.bmp", format="BMP")
 
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
-        bmp_image.save(
-            bmpimagefile, format="bitmap", bpp=24
-        )  # , subsampling=0, optimize=False, quality=100)
-
+        # bmp_image.save(
+        #     bmpimagefile, format="bitmap", bpp=24
+        # )  # , subsampling=0, optimize=False, quality=100)
+        self.save_bmp_24bit(resized_image, bmpimagefile)
         # resized_image.save(bmpimagefile, format="BMP",
         return self.app.send_static_file("weather.bmp")
 
