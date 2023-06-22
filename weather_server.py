@@ -7,6 +7,7 @@ import mimetypes
 import socket
 import os
 import struct
+import numpy as np
 
 from flask import Flask, send_from_directory
 from gevent import pywsgi
@@ -134,23 +135,30 @@ class WeatherServer:
         image = Image.open(imagefile).convert("RGB")
         # image_rgb = image.convert("RGB")
         # Resize the image
-        resized_image = image.resize((240, 135))
+        image_rgb = image.resize((240, 135))
         bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
 
-        image_16bit = Image.new("RGB565", resized_image.size)
+        # Convert the image to a numpy array
+        image_array = np.array(image_rgb)
 
-        # Iterate over each pixel and convert to RGB565 format
-        for y in range(resized_image.height):
-            for x in range(resized_image.width):
-                r, g, b = resized_image.getpixel((x, y))
-                rgb565 = ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3)
-                image_16bit.putpixel((x, y), rgb565)
+        # Extract the individual color channels
+        red = image_array[:, :, 0]
+        green = image_array[:, :, 1]
+        blue = image_array[:, :, 2]
+
+        # Convert the color channels to 5-bit and 6-bit precision
+        red = np.bitwise_and(red >> 3, 0x1F)
+        green = np.bitwise_and(green >> 2, 0x3F)
+        blue = np.bitwise_and(blue >> 3, 0x1F)
+
+        # Combine the color channels into a single 16-bit array
+        rgb565 = np.bitwise_or(np.bitwise_or(red << 11, green << 5), blue)
+
+        # Create a new image from the RGB565 array
+        image_16bit = Image.fromarray(rgb565.astype(np.uint16))
 
         # Save the image as a 16-bit BMP file
         image_16bit.save(bmpimagefile, format="BMP")
-
-        # self.save_bmp_24bit(resized_image, bmpimagefile)
-        # resized_image.save(bmpimagefile, format="BMP",
         return self.app.send_static_file("weather.bmp")
 
     def socket_event_worker_thread(self, log, app, keyfile=None, certfile=None):
