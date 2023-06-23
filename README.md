@@ -94,6 +94,8 @@ Options: `-t`: use threading (crashes on macOS, matplotlib can't work in threads
 
 ![](https://github.com/domschl/python-dwd-forecast/blob/master/resources/esp32-billboard.jpg)
 
+There's a special url `ministation/<station-number>` that delivers an RGB565 encoded bitmap of size 240x135 suitable for display on an Adafruit ESP32-S2-TFT. See [ESP32 Billboard](https://github.com/muwerk/examples/tree/master/esp32s2tft-billboard) for example code.
+
 ## Notes
 
 Downloaded data is automatically cached to prevent unnecessary load on the DWD servers. Station-ID lists are cached for 1 day, and weather forecast data ist cached for 1 hour before the next download is initiated.
