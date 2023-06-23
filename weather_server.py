@@ -119,15 +119,11 @@ class WeatherServer:
         # Combine the color channels into a single 16-bit array
         rgb565 = np.bitwise_or(np.bitwise_or(red << 11, green << 5), blue)
         # Flatten the array
-        # rgb565_flat = rgb565.flatten()
-        # Convert the array to binary data
-        # binary_data = rgb565_flat.astype(np.uint16).tobytes()
-
-        # Flatten the array
         rgb565_flat = rgb565.flatten()
-
+        # Convert the array to binary data
+        binary_data = rgb565_flat.astype(np.uint16).tobytes()
         # Convert the array to binary data with correct byte order
-        binary_data = rgb565_flat.astype(np.uint16).newbyteorder("<")  # .tobytes()
+        # binary_data = rgb565_flat.astype(np.uint16).newbyteorder("<")  # .tobytes()
 
         # Save the binary data to a file
         with open(output_file, "wb") as file:
