@@ -31,6 +31,7 @@ class WeatherServer:
         mimetypes.add_type("image/png", ".png")
         mimetypes.add_type("image/png", ".ico")
         mimetypes.add_type("image/bmp", ".bmp")
+        mimetypes.add_type("application/octet-stream", ".bin")
 
         self.log = logging.getLogger("WeatherServer")
         self.port = port
@@ -64,7 +65,7 @@ class WeatherServer:
         self.app.add_url_rule("/styles/weather.css", "style", self.weather_style)
         self.app.add_url_rule("/favicon.ico", "favi", self.favicon)
         self.app.add_url_rule("/weather.png", "weather", self.weather_plot)
-        self.app.add_url_rule("/weather.bmp", "miniweather", self.miniweather_plot)
+        self.app.add_url_rule("/weather.bin", "miniweather", self.miniweather_plot)
         self.active = True
         if threading is True:
             self.socket_handler()  # Start threads for web
@@ -89,7 +90,7 @@ class WeatherServer:
         return self.app.send_static_file("weather.png")
 
     def miniweather_plot(self):
-        imagefile = os.path.join(self.static_resources, "/weather.bmp")
+        imagefile = os.path.join(self.static_resources, "/weather.bin")
         self.wplot.plot(self.station_id, image_file=imagefile)
         return self.app.send_static_file("weather.bmp")
 
@@ -126,6 +127,28 @@ class WeatherServer:
         with open(output_file, "wb") as f:
             f.write(header + dib_header + bytes(pixel_bytes))
 
+    def img2rgb565(self, image, output_file):
+        image_rgb = image.convert("RGB")
+        # Convert the image to a numpy array
+        image_array = np.array(image_rgb)
+        # Extract the individual color channels
+        red = image_array[:, :, 0]
+        green = image_array[:, :, 1]
+        blue = image_array[:, :, 2]
+        # Convert the color channels to 5-bit and 6-bit precision
+        red = np.bitwise_and(red >> 3, 0x1F)
+        green = np.bitwise_and(green >> 2, 0x3F)
+        blue = np.bitwise_and(blue >> 3, 0x1F)
+        # Combine the color channels into a single 16-bit array
+        rgb565 = np.bitwise_or(np.bitwise_or(red << 11, green << 5), blue)
+        # Flatten the array
+        rgb565_flat = rgb565.flatten()
+        # Convert the array to binary data
+        binary_data = rgb565_flat.astype(np.uint16).tobytes()
+        # Save the binary data to a file
+        with open(output_file, "wb") as file:
+            file.write(binary_data)
+
     def ministations(self, path):
         id = path.split("/")[-1]
         self.log.info(f"We are getting {id}")
@@ -133,33 +156,10 @@ class WeatherServer:
         self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
         # resize imagefile to 240x135 and save as weather.bmp
         image = Image.open(imagefile).convert("RGB")
-        # image_rgb = image.convert("RGB")
-        # Resize the image
         image_rgb = image.resize((240, 135))
-        bmpimagefile = os.path.join(self.static_resources, "weather.bmp")
-
-        # Convert the image to a numpy array
-        image_array = np.array(image_rgb)
-
-        # Extract the individual color channels
-        red = image_array[:, :, 0]
-        green = image_array[:, :, 1]
-        blue = image_array[:, :, 2]
-
-        # Convert the color channels to 5-bit and 6-bit precision
-        red = np.bitwise_and(red >> 3, 0x1F)
-        green = np.bitwise_and(green >> 2, 0x3F)
-        blue = np.bitwise_and(blue >> 3, 0x1F)
-
-        # Combine the color channels into a single 16-bit array
-        rgb565 = np.bitwise_or(np.bitwise_or(red << 11, green << 5), blue)
-
-        # Create a new image from the RGB565 array
-        image_16bit = Image.fromarray(rgb565.astype(np.uint16))
-
-        # Save the image as a 16-bit BMP file
-        image_16bit.save(bmpimagefile, format="BMP")
-        return self.app.send_static_file("weather.bmp")
+        binimagefile = os.path.join(self.static_resources, "weather.bin")
+        self.img2rgb565(image_rgb, binimagefile)
+        return self.app.send_static_file("weather.bin")
 
     def socket_event_worker_thread(self, log, app, keyfile=None, certfile=None):
         if self.certfile is None or self.keyfile is None:
