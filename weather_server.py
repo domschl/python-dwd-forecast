@@ -123,6 +123,7 @@ class WeatherServer:
         # Convert the array to binary data
         binary_data = rgb565.tobytes()  # rgb565_flat.astype(np.uint16).tobytes()
 
+        self.log.info(f"Writing {len(binary_data)} bytes to {output_file}")
         # binary_data = bytes(
         #     [binary_data[i + 1] for i in range(0, len(binary_data), 2)]
         # ) + bytes([binary_data[i] for i in range(0, len(binary_data), 2)])
