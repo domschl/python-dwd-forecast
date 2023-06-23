@@ -113,11 +113,13 @@ class WeatherServer:
         green = image_array[:, :, 1].astype(np.uint16)
         blue = image_array[:, :, 2].astype(np.uint16)
         # Convert the color channels to 5-bit and 6-bit precision
-        red = np.bitwise_and(red >> 3, 0x1F)
-        green = np.bitwise_and(green >> 2, 0x3F)
-        blue = np.bitwise_and(blue >> 3, 0x1F)
+        red = np.bitwise_and(red >> 3, 0x1F).astype(np.uint16)
+        green = np.bitwise_and(green >> 2, 0x3F).astype(np.uint16)
+        blue = np.bitwise_and(blue >> 3, 0x1F).astype(np.uint16)
         # Combine the color channels into a single 16-bit array
-        rgb565 = np.bitwise_or(np.bitwise_or(red << 11, green << 5), blue)
+        rgb565 = np.bitwise_or(
+            np.bitwise_or(red << 11, green << 5).astype(np.uint16), blue
+        ).astype(np.uint16)
         # Flatten the array
         rgb565_flat = rgb565.flatten()
         # Convert the array to binary data
