@@ -121,7 +121,7 @@ class WeatherServer:
         # Flatten the array
         rgb565_flat = rgb565.flatten()
         # Convert the array to binary data
-        binary_data = rgb565_flat.astype(np.uint16).tobytes()
+        binary_data = rgb565_flat  # rgb565_flat.astype(np.uint16).tobytes()
         # Convert the array to binary data with correct byte order
         # binary_data = rgb565_flat.astype(np.uint16).newbyteorder("<")  # .tobytes()
 
