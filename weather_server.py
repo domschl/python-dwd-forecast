@@ -109,9 +109,9 @@ class WeatherServer:
         # Convert the image to a numpy array
         image_array = np.array(image_rgb)
         # Extract the individual color channels
-        red = image_array[:, :, 0]
-        green = image_array[:, :, 1]
-        blue = image_array[:, :, 2]
+        red = image_array[:, :, 0].astype(np.uint16)
+        green = image_array[:, :, 1].astype(np.uint16)
+        blue = image_array[:, :, 2].astype(np.uint16)
         # Convert the color channels to 5-bit and 6-bit precision
         red = np.bitwise_and(red >> 3, 0x1F)
         green = np.bitwise_and(green >> 2, 0x3F)
