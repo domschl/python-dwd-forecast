@@ -6,4 +6,5 @@ certs/
 .ipynb_checkpoints/
 weather.png
 weather.bmp
+weather.bin
 weather_server.service
