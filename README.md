@@ -90,6 +90,10 @@ Options: `-t`: use threading (crashes on macOS, matplotlib can't work in threads
 * `flask`, `gevent` for the web server part.
 * `pillow`, to resize the resultant plot for Arudino billboards.
 
+### Integration with home automation
+
+![](https://github.com/domschl/python-dwd-forecast/blob/master/resources/esp32-billboard.jpg)
+
 ## Notes
 
 Downloaded data is automatically cached to prevent unnecessary load on the DWD servers. Station-ID lists are cached for 1 day, and weather forecast data ist cached for 1 hour before the next download is initiated.
