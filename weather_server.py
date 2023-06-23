@@ -104,29 +104,6 @@ class WeatherServer:
         self.wplot.plot(id, image_file=imagefile, dpi=self.dpi)
         return self.app.send_static_file("weather.png")
 
-    def save_bmp_24bit(self, image, output_file):
-        width, height = image.size
-        pixel_data = list(image.getdata())
-
-        # BMP header (14 bytes)
-        header = struct.pack("<2sIHHI", b"BM", 54 + width * height * 3, 0, 0, 54)
-
-        # DIB header (40 bytes)
-        dib_header = struct.pack(
-            "<IIIHHIIIIII", 40, width, height, 1, 24, 0, width * height * 3, 0, 0, 0, 0
-        )
-
-        # Pixel data (row order is reversed)
-        pixel_bytes = []
-        for i in range(height - 1, -1, -1):
-            for j in range(width):
-                r, g, b = pixel_data[i * width + j]
-                pixel_bytes.extend([b, g, r])
-
-        # Save the BMP file
-        with open(output_file, "wb") as f:
-            f.write(header + dib_header + bytes(pixel_bytes))
-
     def img2rgb565(self, image, output_file):
         image_rgb = image.convert("RGB")
         # Convert the image to a numpy array
@@ -142,9 +119,16 @@ class WeatherServer:
         # Combine the color channels into a single 16-bit array
         rgb565 = np.bitwise_or(np.bitwise_or(red << 11, green << 5), blue)
         # Flatten the array
-        rgb565_flat = rgb565.flatten()
+        # rgb565_flat = rgb565.flatten()
         # Convert the array to binary data
-        binary_data = rgb565_flat.astype(np.uint16).tobytes()
+        # binary_data = rgb565_flat.astype(np.uint16).tobytes()
+
+        # Flatten the array
+        rgb565_flat = rgb565.flatten()
+
+        # Convert the array to binary data with correct byte order
+        binary_data = rgb565_flat.astype(np.uint16).newbyteorder("<").tobytes()
+
         # Save the binary data to a file
         with open(output_file, "wb") as file:
             file.write(binary_data)
